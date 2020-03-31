@@ -1,0 +1,4 @@
+#!/bin/bash
+dir=$(dirname "$0")
+
+/bin/php ${dir}/vendor/phpunit/phpunit/phpunit --colors --bootstrap ${dir}/vendor/autoload.php ${dir}/tests
