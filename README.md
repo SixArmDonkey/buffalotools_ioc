@@ -28,15 +28,18 @@ This container will maintain a single reference to any registered service.
   
   
 
-Example:
+## Example
 
 ```php
+//..Create the IOC container
 $ioc = new IOC();
 
+//..Add some interface to the container, and supply a factory for creating new instances 
 $ioc->addInterface( \namespace\to\SomeAmazingClass::class, function() {
   return new SomeAmazingClass();
 });
 
+//..Retrieve the class instance by supplying the same interface or class name as supplied to addInterface()
 $amazing = $ioc->getInstance( \namespace\to\SomeAmazingClass::class );
 ```
 
