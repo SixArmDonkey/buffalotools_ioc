@@ -1,4 +1,4 @@
-/tests
-/.gitignore
-/.gitattributes
-/runtests
+tests/ export-ignore
+.gitignore export-ignore
+.gitattributes export-ignore
+runtests export-ignore
