@@ -2,7 +2,7 @@
 	"name"        : "buffalokiwi/buffalotools_ioc",
 	"description" : "IOC / Service Locator for PHP 7.4",
 	"keywords"    : ["service locator","ioc"],
-  "homepage"    : "https://github.com/SixArmDonkey/",
+  "homepage"    : "https://github.com/SixArmDonkey/buffalotools_ioc",
 	"license"     : "MIT",
 	"type"        : "library",
   "authors"     : [
