@@ -14,9 +14,9 @@ composer require buffalokiwi/buffalotools_ioc
   
 ---
 
-This container will maintain a single reference to any registered service.  
+## The Basics 
 
-The basics  
+This container will maintain a single reference to any registered service.  
 
 1. Services are registered by calling addInterface().  The supplied closure contains the call to new class().
 2. Services are instantiated on demand, and no instance is created unless newInstance() is called.
