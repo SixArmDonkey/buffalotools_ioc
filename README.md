@@ -41,6 +41,7 @@ $amazing = $ioc->getInstance( \namespace\to\SomeAmazingClass::class );
 ```
 
 **Note**: Using the ::class suffix is a shortcut to the fully namespaced class name, and will NOT trigger the autoloader.  
+  
 
 **Note 2**: DO NOT add "use" statements when registering objects with the container.  This WILL trigger the autoloader.
   
