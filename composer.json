@@ -1,0 +1,29 @@
+{
+	"name"        : "buffalokiwi/buffalotools_ioc",
+	"description" : "IOC / Service Locator for PHP 7.4",
+	"keywords"    : ["service locator","ioc"],
+  "homepage"    : "https://github.com/SixArmDonkey/",
+	"license"     : "MIT",
+	"type"        : "library",
+  "authors"     : [
+    {
+      "name" : "John Quinn",
+      "email" : "johnquinn3@gmail.com",
+      "role" : "Developer"
+    }
+  ],
+  "autoload" : {
+    "classmap": ["src/"]
+  },
+  "autoload-dev" : {
+    "classmap": ["tests/"]
+  },
+  "require" : {
+    "php" : ">=7.4.0"
+  },
+  "require-dev" : {
+    "phpunit/phpunit": "^8",
+		"phpunit/php-invoker": "^2.0"
+  }
+} 
+
