@@ -42,5 +42,13 @@ interface IIOC
    * @param string $clazz interface name 
    * @return mixed instance to be cast as clazz
    */
-  public function getInstance( string $clazz );  
+  public function getInstance( string $clazz ); 
+  
+  
+  /**
+   * Test if the specified interface has been previously registered with the container
+   * @param string $clazz Class/interface name 
+   * @return bool exists
+   */
+  public function hasInterface( string $clazz ) : bool;
 }
