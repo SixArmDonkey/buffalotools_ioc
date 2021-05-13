@@ -26,7 +26,6 @@ This container will maintain a single reference to any registered service.
 6. All services should be registered in a single location (composition root), and should be automatically injected into constructors via some router.  
 7. When constructing the container, specifying strict mode will test that the instance returned by the closure supplied to addInstance() matches the interface supplied to addInstance() when calling newInstance().
   
-  
 
 ## Example
 

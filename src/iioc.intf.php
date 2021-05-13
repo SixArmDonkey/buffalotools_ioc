@@ -51,4 +51,11 @@ interface IIOC
    * @return bool exists
    */
   public function hasInterface( string $clazz ) : bool;
+  
+  
+  /**
+   * Retrieve a list of class/interface names contained within this container.
+   * @return array keys
+   */
+  public function getInstanceList() : array;  
 }

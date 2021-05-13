@@ -77,6 +77,16 @@ class IOC implements IIOC
   
   
   /**
+   * Retrieve a list of class/interface names contained within this container.
+   * @return array keys
+   */
+  public function getInstanceList() : array
+  {
+    return array_keys( $this->data );
+  }  
+  
+  
+  /**
    * Add an interface an a function responsible for creating instances of said 
    * interface.
    * @param string $clazz Interface name.  Interface::class works nice here and 
@@ -140,7 +150,7 @@ class IOC implements IIOC
    */
   public function hasInterface( string $clazz ) : bool
   {
-    return isset( $this->instances[$clazz] );
+    return isset( $this->data[$clazz] );
   }
 
 
@@ -153,7 +163,9 @@ class IOC implements IIOC
   {
     $this->testNullOrEmpty( $clazz );
     if ( !isset( $this->data[$clazz] ))
-      throw new IOCException( $clazz . ' has not been registered with this container' );    
+    { 
+      throw new IOCException( $clazz . ' has not been registered with this container.' );    
+    }
   }
   
   

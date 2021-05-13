@@ -113,21 +113,39 @@ class IOCTest extends TestCase
   {
     $ioc = new IOC( true ); //..Ensure strict mode is enabled 
     
-    $this->instance->addInterface( \stdClass::class, function() {
+    $ioc->addInterface( \stdClass::class, function() {
       //..Return an anonymous class.
       return new class() {};
     });
     
     $this->expectException( \buffalokiwi\buffalotools\ioc\IOCException::class );
-    $this->instance->getInstance( \stdClass::class );
+    $ioc->getInstance( \stdClass::class );
     
     //..Test with strict mode disabled 
     $ioc = new IOC( false );
-    $this->instance->addInterface( \stdClass::class, function() {
+    $ioc->addInterface( \stdClass::class, function() {
       //..Return an anonymous class.
       return new class() {};
     });
     
-    $this->instance->getInstance( \stdClass::class );
+    $ioc->getInstance( \stdClass::class );
   }
+  
+  
+  
+  /**
+   * Test that adding an interface to the container returns the interface as part of this list.
+   */
+  public function testGetInterfaceList()
+  {
+    $ioc = new IOC( false );
+    
+    $ioc->addInterface( 'TestInterface', function() {
+      return new \stdClass();
+    });
+    
+    $this->assertTrue( in_array( 'TestInterface', $ioc->getInstanceList()));
+  }
+  
+  
 }
