@@ -87,7 +87,7 @@ class IOC implements IIOC
   public function autowire( string $clazz, array $args = [] ) : object
   {
     if ( $this->hasInterface( $clazz ))
-      throw new AutowireException( $clazz . ' has already been registered with this container.  Please call getInstance().' );
+      return $this->getInstance( $clazz );
     else if ( !class_exists( $clazz, true ))
       throw new AutowireException( $clazz . ' cannot be found' );   
 
@@ -108,7 +108,7 @@ class IOC implements IIOC
       if ( $param->isVariadic())
         throw new AutowireException( 'Variadic arguments may not be autowired' );
       
-      $rt = $param->getType();
+      $rt = $param->getType()?->getName();
       /* @var $param \ReflectionParameter */
       
       if ( !$rt )
@@ -116,8 +116,9 @@ class IOC implements IIOC
       
       $name = $param->getName();
       
-
-      if ( isset( $args[$name] ))
+      if ( isset( $args[$name] ) && !is_array( $args[$name] ))
+        $cArgs[] = $args[$name];
+      else if ( isset( $args[$name] ) && is_array( $args[$name] ) && $rt == 'array' )
         $cArgs[] = $args[$name];
       else if ( $this->hasInterface( $rt ))
         $cArgs[] = $this->getInstance( $rt );
@@ -125,7 +126,7 @@ class IOC implements IIOC
         $cArgs[] = $this->autowire( $rt, $args[$name] ?? [] );
       else 
       {
-        throw new AutowireException( 'Cannot determine value for ' . $clazz .  ' constructor argument "' . $name . '".' );
+        throw new AutowireException( 'Cannot determine value for ' . $clazz .  ' constructor argument "' . $name . '" of type "' . $rt . '".  Try declaring this argument in the args array argument.' );
       }
     }
 
