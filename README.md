@@ -48,3 +48,11 @@ $amazing = $ioc->getInstance( \namespace\to\SomeAmazingClass::class );
 **Note 2**: DO NOT add "use" statements when registering objects with the container.  This WILL trigger the autoloader.
   
 **Always use the fully namespaced class or interface name (preferably an interface).**  
+
+
+## Autowire method
+
+The container contains a method autowire().  This will attempt to automatically determine values for some class constructor.
+Variables can be passed in arg#2 as a named map.
+
+
