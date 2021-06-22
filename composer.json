@@ -1,6 +1,6 @@
 {
 	"name"        : "buffalokiwi/buffalotools_ioc",
-	"description" : "IOC / Service Locator for PHP 7.4",
+	"description" : "IOC / Service Locator for PHP 8",
 	"keywords"    : ["service locator","ioc"],
   "homepage"    : "https://github.com/SixArmDonkey/buffalotools_ioc",
 	"license"     : "MIT",
@@ -19,7 +19,7 @@
     "classmap": ["tests/"]
   },
   "require" : {
-    "php" : "^7.4 || ^8.0"
+    "php" : "^8.0"
   },
   "require-dev" : {
     "phpunit/phpunit": "^8",

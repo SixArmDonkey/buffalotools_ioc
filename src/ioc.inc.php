@@ -77,6 +77,63 @@ class IOC implements IIOC
   
   
   /**
+   * Attempt to create an instance of the supplied class.
+   * @param string $clazz Class name
+   * @param array $args map of constructor argument name to value.  This map is checked prior to attempting to autoload
+   * some object.  [varname => value].
+   * @return object
+   * @throws AutowireException
+   */
+  public function autowire( string $clazz, array $args = [] ) : object
+  {
+    if ( $this->hasInterface( $clazz ))
+      throw new AutowireException( $clazz . ' has already been registered with this container.  Please call getInstance().' );
+    else if ( !class_exists( $clazz, true ))
+      throw new AutowireException( $clazz . ' cannot be found' );   
+
+    $c = new \ReflectionClass( $clazz );
+    $params = $c->getConstructor()?->getParameters();
+
+    if ( !is_iterable( $params ))
+    {
+      //..Might be a class
+      return new $clazz( ...$args );
+    }
+    
+    $cArgs = [];
+    
+    
+    foreach( $params as $param )
+    { 
+      if ( $param->isVariadic())
+        throw new AutowireException( 'Variadic arguments may not be autowired' );
+      
+      $rt = $param->getType();
+      /* @var $param \ReflectionParameter */
+      
+      if ( !$rt )
+        throw new AutowireException( 'All constructor arguments for class ' . $clazz . ' must have a declared type.' );
+      
+      $name = $param->getName();
+      
+
+      if ( isset( $args[$name] ))
+        $cArgs[] = $args[$name];
+      else if ( $this->hasInterface( $rt ))
+        $cArgs[] = $this->getInstance( $rt );
+      else if ( class_exists( $rt ))
+        $cArgs[] = $this->autowire( $rt, $args[$name] ?? [] );
+      else 
+      {
+        throw new AutowireException( 'Cannot determine value for ' . $clazz .  ' constructor argument "' . $name . '".' );
+      }
+    }
+
+    return new $clazz( ...$cArgs );    
+  }
+  
+  
+  /**
    * Retrieve a list of class/interface names contained within this container.
    * @return array keys
    */

@@ -15,6 +15,26 @@ use buffalokiwi\buffalotools\ioc\IOC;
 use PHPUnit\Framework\TestCase;
 
 
+class IOCAutowireInterfaceArgument
+{
+  public string $param = 'interfacearg';
+}
+
+class IOCAutowireClassArgument
+{
+  public string $param = 'classarg';
+}
+
+class IOCAutowireClass
+{
+  public function __construct(
+    public IOCAutowireClassArgument $classArg,
+    public string $scalarArg,
+    public IOCAutowireInterfaceArgument $interfaceArg
+  ) {}
+}
+
+
 /**
  * Tests the IOC class 
  */
@@ -148,4 +168,18 @@ class IOCTest extends TestCase
   }
   
   
+  public function testAutowire()
+  {
+    $ioc = new \buffalokiwi\buffalotools\ioc\IOC();
+    $ioc->addInterface( IOCAutowireInterfaceArgument::class, function() {
+      return new IOCAutowireInterfaceArgument();
+    });
+    
+    $instance = $ioc->autowire( IOCAutowireClass::class, ['scalarArg' => 'stringValue'] );
+    
+    $this->assertNotEmpty( $instance );
+    $this->assertInstanceOf( IOCAutowireClassArgument::class, $instance->classArg );
+    $this->assertInstanceOf( IOCAutowireInterfaceArgument::class, $instance->interfaceArg );
+    $this->assertEquals( 'stringValue', $instance->scalarArg );    
+  }  
 }

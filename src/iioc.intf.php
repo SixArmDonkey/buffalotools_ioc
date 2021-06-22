@@ -58,4 +58,15 @@ interface IIOC
    * @return array keys
    */
   public function getInstanceList() : array;  
+  
+  
+  /**
+   * Attempt to create an instance of the supplied class.
+   * @param string $clazz Class name
+   * @param array $args map of constructor argument name to value.  This map is checked prior to attempting to autoload
+   * some object.  [varname => value].
+   * @return object
+   * @throws AutowireException
+   */
+  public function autowire( string $clazz, array $args = [] ) : object;  
 }
