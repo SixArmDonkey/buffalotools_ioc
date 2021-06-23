@@ -165,6 +165,15 @@ class IOC implements IIOC
   }
   
   
+  public function addAutoInterface( string $interface, string $clazz, array $args ) : void
+  {
+    $self = $this;
+    $this->addInterface( $interface, function() use($clazz,$self,&$args) {
+      return $self->autowire( $clazz, $args );
+    });
+  }
+  
+  
   
   /**
    * Create a new instance of some interface.

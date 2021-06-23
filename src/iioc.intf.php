@@ -29,6 +29,9 @@ interface IIOC
   public function addInterface( string $clazz, Callable $factory );
   
   
+  public function addAutoInterface( string $interface, string $clazz, array $args ) : void;
+  
+  
   /**
    * Create a new instance of some interface.
    * @param string $clazz interface name 
