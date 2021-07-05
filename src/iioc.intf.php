@@ -23,13 +23,15 @@ interface IIOC
    * @param string $clazz Interface name.  Interface::class works nice here and 
    * does not trigger the autoloader.
    * @param callable $factory Factory for creating new instances 
-   * @throws InvalidArgumentException If class is nullor empty or if clazz has already
+   * @param bool $overwrite If an interface has already been registered, setting this to true will overwrite the previous
+   * entry and will NOT throw an exception.  False (default) simply throws an exception.
+   * @throws InvalidArgumentException If class is null or empty or if clazz has already
    * been registered.
    */
-  public function addInterface( string $clazz, Callable $factory );
+  public function addInterface( string $clazz, Callable $factory, bool $overwrite = false ) : void;
   
   
-  public function addAutoInterface( string $interface, string $clazz, array $args ) : void;
+  public function addAutoInterface( string $interface, string $clazz, array $args, bool $overwrite = false ) : void;
   
   
   /**
