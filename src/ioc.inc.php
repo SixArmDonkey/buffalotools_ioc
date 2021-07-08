@@ -108,6 +108,7 @@ class IOC implements IIOC
       if ( $param->isVariadic())
         throw new AutowireException( 'Variadic arguments may not be autowired' );
       
+      
       $rt = $param->getType()?->getName();
       /* @var $param \ReflectionParameter */
       
@@ -123,10 +124,14 @@ class IOC implements IIOC
       else if ( $this->hasInterface( $rt ))
         $cArgs[] = $this->getInstance( $rt );
       else if ( class_exists( $rt ))
-        $cArgs[] = $this->autowire( $rt, $args[$name] ?? [] );
+        $cArgs[] = $this->autowire( $rt, $args[$name] ?? [] );      
       else 
       {
-        throw new AutowireException( 'Cannot determine value for ' . $clazz .  ' constructor argument "' . $name . '" of type "' . $rt . '".  Try declaring this argument in the args array argument.' );
+        try {
+          $cArgs[] = $param->getDefaultValue();
+        } catch ( \ReflectionException $e ) {
+          throw new AutowireException( 'Cannot determine value for ' . $clazz .  ' constructor argument "' . $name . '" of type "' . $rt . '".  Try declaring this argument in the args array argument.' );
+        }
       }
     }
 
@@ -167,7 +172,7 @@ class IOC implements IIOC
   }
   
   
-  public function addAutoInterface( string $interface, string $clazz, array $args, bool $overwrite = false ) : void
+  public function addAutoInterface( string $interface, string $clazz, array $args = [], bool $overwrite = false ) : void
   {
     $self = $this;
     $this->addInterface( $interface, function() use($clazz,$self,&$args) {
