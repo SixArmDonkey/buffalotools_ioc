@@ -11,6 +11,9 @@
 
 namespace buffalokiwi\buffalotools\ioc;
 
+use Closure;
+use InvalidArgumentException;
+
 
 /**
  * Simple Inversion of control container 
@@ -31,7 +34,7 @@ interface IIOC
   public function addInterface( string $clazz, Callable $factory, bool $overwrite = false ) : void;
   
   
-  public function addAutoInterface( string $interface, string $clazz, array $args = [], bool $overwrite = false ) : void;
+  public function addAutoInterface( string $interface, string $clazz, array|Closure $args = [], bool $overwrite = false ) : void;
   
   
   /**

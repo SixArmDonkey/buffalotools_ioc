@@ -10,7 +10,11 @@
 
 namespace buffalokiwi\buffalotools\ioc;
 
+use Closure;
 use InvalidArgumentException;
+use ReflectionClass;
+use ReflectionException;
+use ReflectionParameter;
 
 /**
  * Inversion of control / service locator.
@@ -84,16 +88,23 @@ class IOC implements IIOC
    * @return object
    * @throws AutowireException
    */
-  public function autowire( string $clazz, array $args = [] ) : object
+  public function autowire( string $clazz, array|Closure $args = [] ) : object
   {
     if ( $this->hasInterface( $clazz ))
       return $this->getInstance( $clazz );
     else if ( !class_exists( $clazz, true ))
       throw new AutowireException( $clazz . ' cannot be found' );   
 
-    $c = new \ReflectionClass( $clazz );
+    $c = new ReflectionClass( $clazz );
     $params = $c->getConstructor()?->getParameters();
 
+    
+    if ( $args instanceof Closure )
+      $args = $args();
+    
+    if ( !is_array( $args ))
+      throw new AutowireException( 'ioc autowire for class ' . $clazz . ': $args must be an array or a Closure that returns an array' );
+    
     if ( !is_iterable( $params ))
     {
       //..Might be a class
@@ -110,7 +121,7 @@ class IOC implements IIOC
       
       
       $rt = $param->getType()?->getName();
-      /* @var $param \ReflectionParameter */
+      /* @var $param ReflectionParameter */
       
       if ( !$rt )
         throw new AutowireException( 'All constructor arguments for class ' . $clazz . ' must have a declared type.' );
@@ -129,7 +140,7 @@ class IOC implements IIOC
       {
         try {
           $cArgs[] = $param->getDefaultValue();
-        } catch ( \ReflectionException $e ) {
+        } catch ( ReflectionException $e ) {
           throw new AutowireException( 'Cannot determine value for ' . $clazz .  ' constructor argument "' . $name . '" of type "' . $rt . '".  Try declaring this argument in the args array argument.' );
         }
       }
@@ -172,7 +183,7 @@ class IOC implements IIOC
   }
   
   
-  public function addAutoInterface( string $interface, string $clazz, array $args = [], bool $overwrite = false ) : void
+  public function addAutoInterface( string $interface, string $clazz, array|Closure $args = [], bool $overwrite = false ) : void
   {
     $self = $this;
     $this->addInterface( $interface, function() use($clazz,$self,&$args) {
