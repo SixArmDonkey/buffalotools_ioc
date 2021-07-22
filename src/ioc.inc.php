@@ -202,13 +202,7 @@ class IOC implements IIOC
   {
     $this->testRegistered( $clazz );    
     
-    $instance = $this->data[$clazz]();
-    if ( $this->strict && !is_a( $instance, $clazz, false ))
-    {
-      throw new IOCException( 'IoC container contains an incorrect definition for type ' . $clazz . ' got ' . get_class( $instance ));
-    }
-    
-    return $instance;
+    return $this->createInstance( $clazz );
   }
   
   
@@ -263,5 +257,17 @@ class IOC implements IIOC
   {
     if ( $clazz == null || empty( trim( $clazz )))
       throw new InvalidArgumentException( "clazz must not be null or empty" );    
+  }
+  
+  
+  private function createInstance( string $clazz ) : mixed
+  {
+    $instance = $this->data[$clazz]();
+    if ( $this->strict && !is_a( $instance, $clazz, false ))
+    {
+      throw new IOCException( 'IoC container contains an incorrect definition for type ' . $clazz . ' got ' . get_class( $instance ));
+    }
+    
+    return $instance;
   }
 }
