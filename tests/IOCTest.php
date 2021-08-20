@@ -10,8 +10,10 @@
 
 declare( strict_types=1 );
 
+use buffalokiwi\buffalotools\ioc\DefaultArgumentMapper;
 use buffalokiwi\buffalotools\ioc\IIOC;
 use buffalokiwi\buffalotools\ioc\IOC;
+use buffalokiwi\buffalotools\ioc\IOCException;
 use PHPUnit\Framework\TestCase;
 
 
@@ -64,20 +66,39 @@ class IOCTest extends TestCase
    * 2. Requires a non-null callable/factory 
    * 3. Adding the same interface twice will throw an exception
    */
-  public function testAddInterface()
+  public function testAddInterface() : void
   {
-    $this->expectException( TypeError::class );
-    $this->instance->addInterface( null, function(){});
+    try {
+      $this->instance->addInterface( null, function(){});
+      $this->fail( 'Interface name must not be null/empty.  Ensure this throws TypeError' );
+    } catch( TypeError $e ) {
+      //..Expected
+    }
     
-    $this->expectException( TypeError::class );
-    $this->instance->addInterface( 'someinterface', null );
+    try {
+      $this->instance->addInterface( 'someinterface', null );
+      $this->fail( 'Argument #2 of addInterface() must be a Closure.  Ensure this throws TypeError' );
+    } catch( TypeError $e ) {
+      //..Expected
+    }
     
-    $this->expectException( InvalidArgumentException::class );
-    $this->instance->addInterface( '', function(){});
+    try {
+      $this->instance->addInterface( '', function(){});
+      $this->fail( 'Interface name must not be an empty string.  Ensure this throws InvalidArgumentException' );
+    } catch( InvalidArgumentException $e ) {
+      //..Expected
+    }
     
     $this->instance->addInterface( 'interface', function(){});
-    $this->expectException( InvalidArgumentException::class );
-    $this->instance->addInterface( 'interface', function(){});
+    
+    try {
+      $this->instance->addInterface( 'interface', function(){});
+      $this->fail( 'The same interface may not be added twice.  Ensure this throws InvalidArgumentException' );
+    } catch( InvalidArgumentException $e ) {
+      //..Expected
+    }
+    
+    $this->expectNotToPerformAssertions();
   }
   
   
@@ -88,17 +109,17 @@ class IOCTest extends TestCase
    * 2. Assert calling getInstance() again returns the same instance 
    * 3. Assert newInstance() returns the correct type 
    */
-  public function testGetInstance()
+  public function testGetInstance() : void
   {
-    $this->instance->addInterface( \stdClass::class, function() {
-      return new \stdClass();
+    $this->instance->addInterface( stdClass::class, function() {
+      return new stdClass();
     });
     
-    $newInstance = $this->instance->getInstance( \stdClass::class );
-    $this->assertSame( \stdClass::class, get_class( $newInstance ));
+    $newInstance = $this->instance->getInstance( stdClass::class );
+    $this->assertSame( stdClass::class, get_class( $newInstance ));
     
     //..Should be the same instance 
-    $this->assertSame( $newInstance, $this->instance->getInstance( \stdClass::class ));
+    $this->assertSame( $newInstance, $this->instance->getInstance( stdClass::class ));
   }
   
   
@@ -108,17 +129,17 @@ class IOCTest extends TestCase
    * 1. Assert that newInstance() always returns a new instance 
    * 2. Assert newInstance() returns the correct type 
    */
-  public function getNewInstance()
+  public function testGetNewInstance() : void
   {
-    $instance = new \stdClass();
-    $this->instance->addInterface( \stdClass::class, function() {
-      return new \stdClass();
+    $instance = new stdClass();
+    $this->instance->addInterface( stdClass::class, function() {
+      return new stdClass();
     });
     
-    $a = $this->instance->newInstance( \stdClass::class );
-    $this->assertSame( \stdClass::class, get_class( $a ));
+    $a = $this->instance->newInstance( stdClass::class );
+    $this->assertSame( stdClass::class, get_class( $a ));
     
-    $b = $this->instance->newInstance( \stdClass::class );
+    $b = $this->instance->newInstance( stdClass::class );
     $this->assertNotSame( $a, $b );
   }
   
@@ -129,26 +150,32 @@ class IOCTest extends TestCase
    * 1. Assert that strict mode throws an exception when the closure passed to addInterface() returns an incorrect type
    * 2. Assert #1 does not happen when strict mode is disabled 
    */
-  public function testStrictMode()
+  public function testStrictMode() : void
   {
     $ioc = new IOC( true ); //..Ensure strict mode is enabled 
     
-    $ioc->addInterface( \stdClass::class, function() {
+    $ioc->addInterface( stdClass::class, function() {
       //..Return an anonymous class.
       return new class() {};
     });
     
-    $this->expectException( \buffalokiwi\buffalotools\ioc\IOCException::class );
-    $ioc->getInstance( \stdClass::class );
+    try {
+      $ioc->getInstance( stdClass::class );
+      $this->fail( 'When getInstance() returns an object NOT an instance of the supplied interface/class name, IOCException must be thrown' );
+    } catch( IOCException $e ) {
+      //..Expected
+    }
     
     //..Test with strict mode disabled 
     $ioc = new IOC( false );
-    $ioc->addInterface( \stdClass::class, function() {
+    $ioc->addInterface( stdClass::class, function() {
       //..Return an anonymous class.
       return new class() {};
     });
     
-    $ioc->getInstance( \stdClass::class );
+    $ioc->getInstance( stdClass::class );
+    
+    $this->expectNotToPerformAssertions();
   }
   
   
@@ -156,21 +183,21 @@ class IOCTest extends TestCase
   /**
    * Test that adding an interface to the container returns the interface as part of this list.
    */
-  public function testGetInterfaceList()
+  public function testGetInterfaceList() : void
   {
     $ioc = new IOC( false );
     
     $ioc->addInterface( 'TestInterface', function() {
-      return new \stdClass();
+      return new stdClass();
     });
     
     $this->assertTrue( in_array( 'TestInterface', $ioc->getInstanceList()));
   }
   
   
-  public function testAutowire()
+  public function testAutowire() : void
   {
-    $ioc = new \buffalokiwi\buffalotools\ioc\IOC();
+    $ioc = new IOC();
     $ioc->addInterface( IOCAutowireInterfaceArgument::class, function() {
       return new IOCAutowireInterfaceArgument();
     });
@@ -182,4 +209,22 @@ class IOCTest extends TestCase
     $this->assertInstanceOf( IOCAutowireInterfaceArgument::class, $instance->interfaceArg );
     $this->assertEquals( 'stringValue', $instance->scalarArg );    
   }  
+  
+  
+  /**
+   * This is more of an integration test to ensure that IOC correctly calls IArgumentMapper::map() within autowire().
+   * @return void
+   */
+  public function testDefaultArgumentMapper() : void
+  {
+    $ioc = new IOC( false, new DefaultArgumentMapper([ IOCAutowireClass::class => ['scalarArg' => 'stringValue']] ));
+    
+    $ioc->addInterface( IOCAutowireInterfaceArgument::class, function() {
+      return new IOCAutowireInterfaceArgument();
+    });    
+        
+    $instance = $ioc->autowire( IOCAutowireClass::class );
+    $this->assertNotEmpty( $instance );
+    $this->assertEquals( 'stringValue', $instance->scalarArg );    
+  }
 }

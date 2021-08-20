@@ -56,3 +56,10 @@ The container contains a method autowire().  This will attempt to automatically 
 Variables can be passed in arg#2 as a named map.
 
 
+## Argument Mapper
+
+An instance of IArgumentMapper may be supplioed to the constructor of class IOC.  When calling autowire(), the mapper is first
+checked for a class/interface name matching the one supplied to autowire().  If found, the arguments contained within the mapper
+are merged with the $args array supplied to autowire() with $args taking precedence.  This can be used to move certain configuration
+elements to a different location.
+

@@ -16,6 +16,7 @@ use ReflectionClass;
 use ReflectionException;
 use ReflectionParameter;
 
+
 /**
  * Inversion of control / service locator.
  * 
@@ -67,16 +68,24 @@ class IOC implements IIOC
    */
   private bool $strict;
   
+  /**
+   * Mapper 
+   * @var IArgumentMapper|null
+   */
+  private ?IArgumentMapper $mapper;
+  
   
   /**
    * Create a new IOC instance 
    * @param bool $strict If true, then returned instances will test 
    * instanceof against the supplied interface/class name, and an exception
    * will be thrown if they don't match.
+   * @param IArgumentMapper|null $mapper Optional argument mapper to provide arguments for autowire() 
    */
-  public function __construct( bool $strict = true )
+  public function __construct( bool $strict = true, ?IArgumentMapper $mapper = null )
   {
     $this->strict = $strict;
+    $this->mapper = $mapper;
   }
   
   
@@ -99,8 +108,10 @@ class IOC implements IIOC
     $params = $c->getConstructor()?->getParameters();
 
     
-    if ( $args instanceof Closure )
-      $args = $args();
+    $args = ( $args instanceof Closure ) 
+      ? $this->mapArguments( $clazz, $args()) 
+      : $this->mapArguments( $clazz, $args );
+    
     
     if ( !is_array( $args ))
       throw new AutowireException( 'ioc autowire for class ' . $clazz . ': $args must be an array or a Closure that returns an array' );
@@ -128,8 +139,11 @@ class IOC implements IIOC
       
       $name = $param->getName();
       
+      
       if ( isset( $args[$name] ) && !is_array( $args[$name] ))
+      {
         $cArgs[] = $args[$name];
+      }
       else if ( isset( $args[$name] ) && is_array( $args[$name] ) && $rt == 'array' )
         $cArgs[] = $args[$name];
       else if ( $this->hasInterface( $rt ))
@@ -269,5 +283,19 @@ class IOC implements IIOC
     }
     
     return $instance;
+  }
+  
+  
+  /**
+   * Retrieve the mapped arguments if available
+   * @param string $clazz class/interface name
+   * @return array arguments or empty array if none exist
+   */
+  private function mapArguments( string $clazz, array $args ) : array
+  {
+    if ( $this->mapper != null && $this->mapper->hasArgument( $clazz ))
+      return $this->mapper->map( $clazz, $args );
+    
+    return $args;
   }
 }
