@@ -107,11 +107,9 @@ class IOC implements IIOC
     $c = new ReflectionClass( $clazz );
     $params = $c->getConstructor()?->getParameters();
 
-    
     $args = ( $args instanceof Closure ) 
       ? $this->mapArguments( $clazz, $args()) 
       : $this->mapArguments( $clazz, $args );
-    
     
     if ( !is_array( $args ))
       throw new AutowireException( 'ioc autowire for class ' . $clazz . ': $args must be an array or a Closure that returns an array' );
@@ -123,7 +121,6 @@ class IOC implements IIOC
     }
     
     $cArgs = [];
-    
     
     foreach( $params as $param )
     { 
@@ -139,11 +136,8 @@ class IOC implements IIOC
       
       $name = $param->getName();
       
-      
       if ( isset( $args[$name] ) && !is_array( $args[$name] ))
-      {
         $cArgs[] = $args[$name];
-      }
       else if ( isset( $args[$name] ) && is_array( $args[$name] ) && $rt == 'array' )
         $cArgs[] = $args[$name];
       else if ( $this->hasInterface( $rt ))
@@ -200,6 +194,11 @@ class IOC implements IIOC
   public function addAutoInterface( string $interface, string $clazz, array|Closure $args = [], bool $overwrite = false ) : void
   {
     $self = $this;
+    
+    $args = ( $args instanceof Closure ) 
+      ? $this->mapArguments( $interface, $args()) 
+      : $this->mapArguments( $interface, $args );    
+    
     $this->addInterface( $interface, function() use($clazz,$self,&$args) {
       return $self->autowire( $clazz, $args );
     }, $overwrite );
